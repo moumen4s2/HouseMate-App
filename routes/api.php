@@ -1,0 +1,24 @@
+<?php
+
+use App\Http\Controllers\Auth\ForgetPasswordController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\UpdatePersonalInfoController;
+use App\Http\Controllers\Auth\VerifyController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+//Auth
+Route::post('/register', [RegisterController::class, 'store'])->middleware('guest:sanctum');
+Route::post('/verify', [VerifyController::class, 'store'])->middleware('guest:sanctum');
+Route::post('/login', [LoginController::class, 'store'])->middleware('guest:sanctum');
+Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/forget-password', [ForgetPasswordController::class, 'store'])->middleware('guest:sanctum');
+Route::post('/new-password', [NewPasswordController::class, 'store'])->middleware('guest:sanctum');
+Route::post('/update-user-info', [UpdatePersonalInfoController::class, 'store'])->middleware('auth:sanctum');
+

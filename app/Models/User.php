@@ -5,27 +5,42 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
         'role',
         'first_name',
         'last_name',
-        'email',
         'phone',
         'password',
         'avatar_url',
         'id_document_url',
-        'is_approved'
+        'is_approved',
+        'email_verified_at',
+        'email',
+        'phone',
+        'otp',
+        'expire_at',
+        'date_of_birth'
     ];
 
     protected $hidden = [
         'password',
+        'otp',
+        'expire_at'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'password'=>'hashed',
+            'expire_at' => 'datetime',
+        ];
+    }
     // Relationships
     public function apartments()
     {
