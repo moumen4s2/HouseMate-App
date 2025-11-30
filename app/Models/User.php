@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
 
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
@@ -75,10 +76,5 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->hasMany(Notification::class);
-    }
-
-    public function auditLogs()
-    {
-        return $this->hasMany(AuditLog::class);
     }
 }

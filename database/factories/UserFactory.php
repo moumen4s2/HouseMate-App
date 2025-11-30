@@ -2,43 +2,31 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
-        ];
-    }
+        static $password;
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return [
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'phone' => fake()->unique()->numerify('9########'), 
+            'email' => fake()->unique()->safeEmail(),
+            'password' => $password ??= Hash::make('password12345'), 
+            'role' => fake()->randomElement(['tenant', 'owner']), 
+            'is_approved' => true, 
+            'email_verified_at' => now(),
+            'date_of_birth' => fake()->date('Y-m-d', '2000-01-01'),
+            'id_document_url' => 'documents/' . fake()->uuid() . '.jpg', 
+            'avatar_url' => 'profiles/' . fake()->uuid() . '.jpg',
+        ];
     }
 }
