@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('city');
             $table->string('province')->nullable();
-            $table->string('address')->nullable();
+            $table->string('address')->nullable();/*not null*/
             $table->decimal('price', 10,2);
             $table->integer('rooms')->default(1);
             $table->integer('guests')->default(1);

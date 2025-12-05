@@ -27,7 +27,7 @@ class ForgetPasswordController extends Controller
 
         $user = User::where('email', $request->email)->first();
         if (!$user) {
-            return $this->fail('user not found !', 404);;
+            return $this->fail('user not found !', 404);
         }
         $otp = Str::random(6);
         Mail::to($request->email)->send(new VerifyMail($otp));

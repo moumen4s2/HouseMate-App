@@ -23,7 +23,6 @@ class User extends Authenticatable
         'is_approved',
         'email_verified_at',
         'email',
-        'phone',
         'otp',
         'expire_at',
         'date_of_birth'

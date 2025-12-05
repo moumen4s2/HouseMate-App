@@ -64,7 +64,7 @@ class ApartmentController extends Controller
     {
         $user = $request->user();
     
-        if (!$user || $user->role !== 'owner' || !$user->is_approved) {
+        if (!$user || $user->role !== 'owner' /*|| !$user->is_approved*/) {
             return $this->fail('Unauthorized. Only approved owners can list apartments.', 403);
         }
 
@@ -77,7 +77,7 @@ class ApartmentController extends Controller
             'price' => 'required|numeric|min:0',
             'rooms' => 'required|integer|min:1',
             'guests' => 'required|integer|min:1',
-            'images' => 'required|array|min:1', 
+            'images' => 'required'/*array|min:1*/, 
             'images.*' => 'image|mimes:jpeg,png,jpg|max:4096', 
             'is_active' => 'boolean'
         ]);
@@ -101,7 +101,7 @@ class ApartmentController extends Controller
         $images = [];
         foreach ($request->file('images') as $index => $file) {
             $path = $file->store('apartments', 'public'); 
-            $images[] = new ApartmentImage([
+            $images[] = ApartmentImage::create([
                 'url' => $path,
                 'is_main' => ($index === 0) 
             ]);

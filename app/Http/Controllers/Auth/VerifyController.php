@@ -30,8 +30,7 @@ class VerifyController extends Controller
             $user->otp = null;
             $user->expire_at = null;
             $user->save();
-            $token = $user->createToken('token')->plainTextToken;
-            return $this->success('email verified ,and user registerd successfuly !',['token' => $token],201);
+            return $this->success('email verified ,and user registerd successfuly,waiting admin to approverd your register !',['user'=>$user],201);
         }
         return $this->fail('OTP is not correct or expired!',400);
     }

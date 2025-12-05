@@ -26,7 +26,7 @@ class UpdatePersonalInfoController extends Controller
             return $this->fail($validator->errors(), 422);
         }
         $validated = $validator->validated();
-        $user = Auth::user();
+        $user = $request->user();
         if ($request->hasFile('avatar_url')) {
             if ($user->avatar_url !== 'profiles/default-profile.jpg' && Storage::disk('public')->exists($user->avatar_url)) {
                 Storage::disk('public')->delete($user->avatar_url);

@@ -21,7 +21,7 @@ class RegisterController extends Controller
     {
         $validationRules = [
             'first_name' => ['required', 'string', 'max:255'],
-            'phone' => 'required|string|min:10|max:15|regex:/[0-9]/',
+            'phone' => 'required|string|min:10|max:15|regex:/[0-9]/|unique:users',
             'email'=>'required|email|max:255',
             'last_name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/'],
@@ -50,21 +50,21 @@ class RegisterController extends Controller
         $validated['id_document_url'] = $path;
         $otp = Str::random(6);
         Mail::to($request->email)->send(new VerifyMail($otp));
-                
         $validated['password'] = Hash::make($request->password);
-        if ($existingUser && $existingUser->phone_verified_at === null) {
+        if ($existingUser && $existingUser->email_verified_at === null) {
             $existingUser->update([
                 ...$validated,
                 'otp' => Hash::make($otp) ,
                 'expire_at' => now()->addMinutes(15),
             ]);
         } else {
+
             User::create([
                 ...$validated,
                 'otp' => Hash::make($otp),
                 'expire_at' => now()->addMinutes(15),
-            ]);
-        }
+            ]);}
+
         return  $this->success('OTP sent successfully to email, please verify your email !.', null, 200);
     }
 }
