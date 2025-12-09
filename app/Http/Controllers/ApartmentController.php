@@ -60,11 +60,11 @@ class ApartmentController extends Controller
         return $this->success('Apartment details fetched successfully', $apartment);
     }
 
-    public function store(Request $request)
+        public function store(Request $request)
     {
         $user = $request->user();
-    
-        if (!$user || $user->role !== 'owner' /*|| !$user->is_approved*/) {
+
+        if (!$user || $user->role !== 'owner' || !$user->is_approved) {
             return $this->fail('Unauthorized. Only approved owners can list apartments.', 403);
         }
 
@@ -77,8 +77,8 @@ class ApartmentController extends Controller
             'price' => 'required|numeric|min:0',
             'rooms' => 'required|integer|min:1',
             'guests' => 'required|integer|min:1',
-            'images' => 'required'/*array|min:1*/, 
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:4096', 
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:4096',
             'is_active' => 'boolean'
         ]);
 
@@ -98,22 +98,23 @@ class ApartmentController extends Controller
             'is_active' => $request->is_active ?? true,
         ]);
 
-        $images = [];
         foreach ($request->file('images') as $index => $file) {
-            $path = $file->store('apartments', 'public'); 
-            $images[] = ApartmentImage::create([
+            $path = $file->store('apartments', 'public');
+
+            $apartment->images()->create([
                 'url' => $path,
-                'is_main' => ($index === 0) 
+                'is_main' => ($index === 0),
             ]);
         }
-        $apartment->images()->saveMany($images);
-
+        $apartment->load('images');
         return $this->success('Apartment created successfully!', $apartment, 201);
     }
 
-    public function update(Request $request, Apartment $apartment)
+
+        public function update(Request $request, Apartment $apartment)
     {
         $user = $request->user();
+
         if ($user->id !== $apartment->owner_id) {
             return $this->fail('Forbidden. You do not own this apartment.', 403);
         }
@@ -127,8 +128,15 @@ class ApartmentController extends Controller
             'price' => 'sometimes|numeric|min:0',
             'rooms' => 'sometimes|integer|min:1',
             'guests' => 'sometimes|integer|min:1',
-            'is_active' => 'sometimes|boolean' 
-            //   *****لسا في تعديل الصور **
+            'is_active' => 'sometimes|boolean',
+
+            'images' => 'sometimes|array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:4096',
+
+            'delete_images' => 'sometimes|array',
+            'delete_images.*' => 'integer|exists:apartment_images,id',
+
+            'main_image' => 'sometimes|integer|exists:apartment_images,id',
         ]);
 
         if ($validator->fails()) {
@@ -136,22 +144,56 @@ class ApartmentController extends Controller
         }
 
         $apartment->update($validator->validated());
-        
+
+        if ($request->has('delete_images')) {
+            $imagesToDelete = ApartmentImage::where('apartment_id', $apartment->id)
+                ->whereIn('id', $request->delete_images)
+                ->get();
+
+            foreach ($imagesToDelete as $img) {
+                Storage::disk('public')->delete($img->url);
+                $img->delete();
+            }
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('apartments', 'public');
+
+                $apartment->images()->create([
+                    'url' => $path,
+                    'is_main' => false,
+                ]);
+            }
+        }
+
+        if ($request->has('main_image')) {
+            ApartmentImage::where('apartment_id', $apartment->id)->update(['is_main' => false]);
+
+            ApartmentImage::where('id', $request->main_image)
+                ->where('apartment_id', $apartment->id)
+                ->update(['is_main' => true]);
+        }
+
+        $apartment->load('images');
+
         return $this->success('Apartment updated successfully', $apartment);
     }
+
     public function destroy(Apartment $apartment)
-    {
-        $user = auth::user(); 
+{
+    $user = Auth::user(); 
 
-        if ($user->id !== $apartment->owner_id) {
-            return $this->fail('Forbidden. You do not own this apartment.', 403);
-        }
-
-        foreach ($apartment->images as $image) {
-            Storage::disk('public')->delete($image->url);
-        }
-        $apartment->delete();
-
-        return $this->success('Apartment deleted successfully', null, 200);
+    if ($user->id !== $apartment->owner_id) {
+        return $this->fail('Forbidden. You do not own this apartment.', 403);
     }
+
+    foreach ($apartment->images as $image) {
+        Storage::disk('public')->delete($image->url);
+    }
+
+    $apartment->delete();
+    return $this->success('Apartment deleted successfully', null, 200);
+}
+
 }

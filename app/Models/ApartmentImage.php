@@ -13,9 +13,17 @@ class ApartmentImage extends Model
         'url',
         'is_main'
     ];
+    
+    protected $appends = ['full_url'];
 
     public function apartment()
     {
         return $this->belongsTo(Apartment::class);
     }
+
+    public function getFullUrlAttribute()
+    {
+        return asset('storage/' . $this->url);
+    }
+
 }

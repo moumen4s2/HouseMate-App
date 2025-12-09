@@ -27,16 +27,16 @@ Route::prefix('/auth')->group(function () {
         return $request->user();
     })->middleware('auth:sanctum');
 });
-
+//Apartment
 Route::get('/apartments', [ApartmentController::class, 'index']);
-Route::get('/apartments', [ApartmentController::class, 'show']);
+Route::get('/apartments/{apartment}', [ApartmentController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/apartments', [ApartmentController::class, 'store']);
     Route::put('/apartments/{apartment}', [ApartmentController::class, 'update']);
     Route::delete('/apartments/{apartment}', [ApartmentController::class, 'destroy']);
 });
-
+//Booking
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('bookings', [BookingController::class, 'store']);
     Route::get('bookings', [BookingController::class, 'index']);
