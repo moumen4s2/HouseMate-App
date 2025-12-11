@@ -31,6 +31,10 @@ class ApartmentController extends Controller
         if ($request->has('rooms_min') && is_numeric($request->rooms_min)) {
             $query->where('rooms', '>=', $request->rooms_min);
         }
+
+        if ($request->has('guests_min') && is_numeric($request->guests_min)) {
+        $query->where('guests', '>=', $request->guests_min);
+        }
     
         $query->where('is_active', true);
 
@@ -181,19 +185,19 @@ class ApartmentController extends Controller
     }
 
     public function destroy(Apartment $apartment)
-{
-    $user = Auth::user(); 
+    {
+        $user = Auth::user(); 
 
-    if ($user->id !== $apartment->owner_id) {
-        return $this->fail('Forbidden. You do not own this apartment.', 403);
+        if ($user->id !== $apartment->owner_id) {
+            return $this->fail('Forbidden. You do not own this apartment.', 403);
+        }
+
+        foreach ($apartment->images as $image) {
+            Storage::disk('public')->delete($image->url);
+        }
+
+        $apartment->delete();
+        return $this->success('Apartment deleted successfully', null, 200);
     }
-
-    foreach ($apartment->images as $image) {
-        Storage::disk('public')->delete($image->url);
-    }
-
-    $apartment->delete();
-    return $this->success('Apartment deleted successfully', null, 200);
-}
 
 }

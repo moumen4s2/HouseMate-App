@@ -14,7 +14,10 @@ class Booking extends Model
         'start_date',
         'end_date',
         'status',
-        'total_price'
+        'total_price',
+        'pending_start_date',
+        'pending_end_date',
+        'old_status'
     ];
 
     protected $casts = [

@@ -41,6 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('bookings', [BookingController::class, 'store']);
     Route::get('bookings', [BookingController::class, 'index']);
     Route::patch('bookings/{booking}', [BookingController::class, 'update']);
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'tenantCancel']);
+    Route::post('/bookings/{booking}/request-update', [BookingController::class, 'tenantRequestUpdate']);
 });
 
 //Admin

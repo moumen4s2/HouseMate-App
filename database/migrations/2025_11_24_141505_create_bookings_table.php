@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained('users');
             $table->date('start_date');
             $table->date('end_date');
+            $table->date('pending_start_date')->nullable();
+            $table->date('pending_end_date')->nullable();
+            $table->string('old_status')->nullable();
             $table->enum('status', ['pending','accepted','rejected','cancelled'])->default('pending');
             $table->decimal('total_price', 10,2)->default(0);
             $table->timestamps();
