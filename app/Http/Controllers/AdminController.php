@@ -15,17 +15,34 @@ class AdminController extends Controller
         return $this->success('done', $users, 200);
     }
 
-    public function approvedRegistration($user_id)
+    // public function approvedRegistration($user_id)
+    // {
+    //     $user = User::find($user_id);
+    //     if (!$user) {
+    //         return $this->fail('user not found !', 404);
+    //     }
+    //     if ($user->email_verified_at && !$user->is_approved && $user->role !== 'admin') {
+    //         $user->is_approved = true;
+    //         $user->save();
+    //         return $this->success('Registration approved !', $user, 201);
+    //     }
+    //     return $this->fail('email not verified or Registration has already been approved !', 400);}
+
+
+    public function approvedRegistration(User $user)
     {
-        $user = User::find($user_id);
-        if (!$user) {
-            return $this->fail('user not found !', 404);
-        }
+
         if ($user->email_verified_at && !$user->is_approved && $user->role !== 'admin') {
             $user->is_approved = true;
             $user->save();
             return $this->success('Registration approved !', $user, 201);
         }
         return $this->fail('email not verified or Registration has already been approved !', 400);
+    }
+
+       public function deleteRegistration(User $user)
+    {
+        $user->delete();
+        return $this->success('Registration deleted successfully!',null, 200);
     }
 }

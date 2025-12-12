@@ -57,7 +57,7 @@ class ApartmentController extends Controller
             'reviews.tenant' 
         ]);
 
-        if (!$apartment->is_active) {
+        if ( !$apartment->is_active ) {
             return $this->fail('Apartment not found or inactive!', 404);
         }
 
@@ -68,7 +68,7 @@ class ApartmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'owner' || !$user->is_approved) {
+        if (!$user || $user->role !== 'owner' /* || !$user->is_approved*/) {
             return $this->fail('Unauthorized. Only approved owners can list apartments.', 403);
         }
 
@@ -173,7 +173,6 @@ class ApartmentController extends Controller
 
         if ($request->has('main_image')) {
             ApartmentImage::where('apartment_id', $apartment->id)->update(['is_main' => false]);
-
             ApartmentImage::where('id', $request->main_image)
                 ->where('apartment_id', $apartment->id)
                 ->update(['is_main' => true]);

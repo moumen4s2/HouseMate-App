@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
+use Exception;
 
 class RegisterController extends Controller
 {
@@ -21,14 +22,14 @@ class RegisterController extends Controller
     {
         $validationRules = [
             'first_name' => ['required', 'string', 'max:255'],
-            'phone' => 'required|string|min:10|max:15|regex:/[0-9]/|unique:users',
-            'email'=>'required|email|max:255',
+            'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/|unique:users',
+            'email' => 'required|email|max:255',
             'last_name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/'],
             'role' => ['nullable', 'string', 'in:tenant,owner'],
             'avatar_url' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
-            'id_document_url' => ['image', 'mimes:jpg,png,jpeg', 'max:4096'],
-            'date_of_birth' => ['required', Rule::date()/*->format('dd-mm-yyyy')*/->before(today())]
+            'id_document_url' => ['required', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
+            'date_of_birth' => ['required', 'date', 'before:today']
         ];
         $existingUser = User::where('email', $request->email)->first();
         if (!$existingUser || $existingUser->email_verified_at !== null) {
@@ -43,18 +44,18 @@ class RegisterController extends Controller
             $path = $request->file('avatar_url')->store('profiles', 'public');
             $validated['avatar_url'] = $path;
         }
-        if (!$request->hasFile('id_document_url')) {
-            return $this->fail('the id document url field is required !',422);
+        if ($request->hasFile('id_document_url')) {
+            $path = $request->file('id_document_url')->store('profiles', 'public');
+            $validated['id_document_url'] = $path;
         }
-        $path = $request->file('id_document_url')->store('profiles', 'public');
-        $validated['id_document_url'] = $path;
+
         $otp = Str::random(6);
         Mail::to($request->email)->send(new VerifyMail($otp));
         $validated['password'] = Hash::make($request->password);
         if ($existingUser && $existingUser->email_verified_at === null) {
             $existingUser->update([
                 ...$validated,
-                'otp' => Hash::make($otp) ,
+                'otp' => Hash::make($otp),
                 'expire_at' => now()->addMinutes(15),
             ]);
         } else {
@@ -63,7 +64,8 @@ class RegisterController extends Controller
                 ...$validated,
                 'otp' => Hash::make($otp),
                 'expire_at' => now()->addMinutes(15),
-            ]);}
+            ]);
+        }
 
         return  $this->success('OTP sent successfully to email, please verify your email !.', null, 200);
     }

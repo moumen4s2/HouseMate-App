@@ -20,7 +20,9 @@ class UpdatePersonalInfoController extends Controller
             'last_name' => ['nullable', 'string', 'max:255'],
             'avatar_url' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
             'id_document_url' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
-            'date_of_birth' => ['nullable', Rule::date()/*->format('dd-mm-yyyy')*/->before(today())]
+            'date_of_birth' => ['nullable', Rule::date()/*->format('dd-mm-yyyy')*/->before(today())],
+            'dir'=>['nullable', 'in:rtl,ltr'],
+            'mode'=>['nullable', 'in:dark,light']
         ]);
         if ($validator->fails()) {
             return $this->fail($validator->errors(), 422);

@@ -22,7 +22,7 @@ class LoginController extends Controller
             return $this->fail($validator->errors(), 422);
         }
 
-        // if ( Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
+        // if ( !Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
         //     return response()->json(['errors' => 'Invalid credentials !'], 401);
         // }
 
@@ -37,7 +37,7 @@ class LoginController extends Controller
         $token = $user->createToken('token')->plainTextToken;
 
 
-        return $this->success('Logged in successfully !', ['token' => $token], 200);
+        return $this->success('Logged in successfully !', ['token' => $token,'role'=>$user->role], 200);
     }
 
     public function destroy(Request $request)
@@ -51,6 +51,6 @@ class LoginController extends Controller
             return $this->success('LogOut successfully !', null, 200);
         }
 
-        $this->fail('LogOut Error , The user does not exist !', 404);
+        return $this->fail('LogOut Error , The user does not exist !', 404);
     }
 }

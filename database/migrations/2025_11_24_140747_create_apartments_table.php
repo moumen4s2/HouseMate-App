@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->string('city');
-            $table->string('province')->nullable();
-            $table->string('address')->nullable();/*not null*/
+            $table->string('province');
+            $table->string('address');
             $table->decimal('price', 10,2);
             $table->integer('rooms')->default(1);
             $table->integer('guests')->default(1);

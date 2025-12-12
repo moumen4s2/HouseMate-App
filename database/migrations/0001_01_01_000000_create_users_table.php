@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('email')->unique();
             $table->string('password');
+            $table->enum('mode', ['light', 'dark'])->default('light');
+            $table->enum('dir', ['ltr', 'rtl'])->default('ltr');
             $table->string('avatar_url')->default('profiles/default-profile.jpg');
             $table->string('id_document_url');
             $table->timestamp('date_of_birth');

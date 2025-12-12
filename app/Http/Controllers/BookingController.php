@@ -47,7 +47,7 @@ class BookingController extends Controller
     {
         $tenant = $request->user();
 
-        if ($tenant->role !== 'tenant' || !$tenant->is_approved) {
+        if ($tenant->role !== 'tenant' /*|| !$tenant->is_approved*/) {
             return $this->fail('Unauthorized. Only approved tenants can book.', 403);
         }
 
