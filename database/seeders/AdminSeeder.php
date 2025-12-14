@@ -23,8 +23,7 @@ class AdminSeeder extends Seeder
         'password'=>Hash::make("0000000000"),
         'id_document_url'=>'profiles/default-profile.jpg',
         'is_approved'=>true,
-        'email_verified_at'=>now(),
-        'email'=>'admin@admin.com',
+        'phone_verified_at'=>now(),
         'date_of_birth'=>'2001-1-1'
         ]);
     }

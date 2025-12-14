@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('phone')->unique();
-            $table->string('email')->unique();
             $table->string('password');
             $table->enum('mode', ['light', 'dark'])->default('light');
             $table->enum('dir', ['ltr', 'rtl'])->default('ltr');
@@ -27,7 +26,7 @@ return new class extends Migration
             $table->boolean('is_approved')->default(false);
             $table->string('otp')->nullable();
             $table->timestamp('expire_at')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('phone_verified_at')->nullable();
             $table->timestamps();
         });
     }

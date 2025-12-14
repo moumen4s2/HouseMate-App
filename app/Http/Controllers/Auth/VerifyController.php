@@ -15,22 +15,22 @@ class VerifyController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => ['required', 'email', 'max:255'],
-            'otp' => ['required', 'string', 'min:6', 'max:6']
+            'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
+            'otp' => ['required', 'string', 'min:5', 'max:5']
         ]);
         if ($validator->fails()) {
             return $this->fail($validator->errors(),422);
         }
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('phone', $request->phone)->first();
         if (!$user) {
             return $this->fail('User not found!',404);
         }
         if ($user->expire_at->gt(now()) && Hash::check($request->otp, $user->otp) ) {
-            $user->email_verified_at = now();
+            $user->phone_verified_at = now();
             $user->otp = null;
             $user->expire_at = null;
             $user->save();
-            return $this->success('email verified ,and user registerd successfuly,waiting admin to approverd your register !',['user'=>$user],201);
+            return $this->success('phone number verified ,and user registerd successfuly,waiting admin to approverd your register !',['user'=>$user],201);
         }
         return $this->fail('OTP is not correct or expired!',400);
     }

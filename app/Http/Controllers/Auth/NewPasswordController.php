@@ -15,15 +15,15 @@ class NewPasswordController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'otp' => ['required', 'string', 'min:6', 'max:6'],
-            'email' => ['required', 'email'],
+            'otp' => ['required', 'string', 'min:5', 'max:5'],
+            'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
             'password' => ['required','confirmed','min:8','regex:/[a-z]/','regex:/[A-Z]/','regex:/[0-9]/','regex:/[@$!%*#?&]/'],
         ]);
         if ($validator->fails()) {
             return $this->fail($validator->errors(), 422);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('phone', $request->phone)->first();
 
         if (!$user) {
             return $this->fail("user not found !", 404);

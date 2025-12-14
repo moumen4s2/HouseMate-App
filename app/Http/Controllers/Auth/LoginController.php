@@ -27,7 +27,7 @@ class LoginController extends Controller
         // }
 
         $user = User::where('phone', $request->phone)
-            ->whereNotNull('email_verified_at')->where('is_approved', true)
+            ->whereNotNull('phone_verified_at')->where('is_approved', true)
             ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {

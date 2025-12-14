@@ -1,1 +1,0 @@
-<h1>verify code :{{$otp}}</h1>
