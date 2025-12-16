@@ -9,7 +9,7 @@ use App\Models\User;
 
 class OtpService
 {
-    private $apiKey = 'ezsJO6ioSg-Xx9aWb78ojT:APA91bGmvyjqAQQS8pY5FZ8DMId-mNfnKr6ABp-4GVa--nbt4f5bR98tC9EmDi5K-eLCRXByFaGGWHbyxgaMTwsJBI7MqPLGxBe-_MfVDVgIkptR_JY0BXs';
+    private $apiKey = '';
 
 
 
