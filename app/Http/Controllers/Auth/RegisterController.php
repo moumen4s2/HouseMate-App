@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Http\Controllers\HelperMethods;
 use Illuminate\Support\Facades\Hash;
 use App\Services\OtpService;
+use Exception;
 
 class RegisterController extends Controller
 {
@@ -23,7 +24,7 @@ class RegisterController extends Controller
     
     public function store(Request $request)
     {
-
+try{
         $validationRules = [
             'first_name' => ['required', 'string', 'max:255'],
             'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
@@ -35,7 +36,7 @@ class RegisterController extends Controller
             'date_of_birth' => ['required', 'date', 'before:today']
         ];
         $existingUser = User::where('phone', $request->phone)->first();
-        if (!$existingUser || $existingUser->email_verified_at !== null) {
+        if (!$existingUser || $existingUser->phone_verified_at !== null) {
             $validationRules['phone'] .= '|unique:users';
         }
         $validator = Validator::make($request->all(), $validationRules);
@@ -72,5 +73,7 @@ class RegisterController extends Controller
          }
 
         return  $this->success('OTP sent successfully to phone number, please verify your phone number !', null, 200);
-        }
+}catch(Exception $e){
+    return response($e);
+}}
 }
