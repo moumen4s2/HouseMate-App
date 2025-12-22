@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-
+use Exception;
 
 class AdminController extends Controller
 {
     use HelperMethods;
 
     public function showRegisters()
-    {
-        $users = User::whereNotNull('email_verified_at')->where('is_approved', false)->where('role', "!=", "admin")->paginate(10);
+    {try{
+        $users = User::whereNotNull('phone_verified_at')->where('is_approved', false)->where('role', "!=", "admin")->paginate(10);
         return $this->success('done', $users, 200);
+        }catch(Exception $e){return response($e);}
     }
 
     // public function approvedRegistration($user_id)
@@ -32,12 +33,13 @@ class AdminController extends Controller
     public function approvedRegistration(User $user)
     {
 
-        if ($user->email_verified_at && !$user->is_approved && $user->role !== 'admin') {
+        if ($user->phone_verified_at && !$user->is_approved && $user->role !== 'admin') {
             $user->is_approved = true;
             $user->save();
             return $this->success('Registration approved !', $user, 201);
         }
-        return $this->fail('email not verified or Registration has already been approved !', 400);
+        return $this->fail('phone not verified or Registration has already been approved !', 400);
+        
     }
 
        public function deleteRegistration(User $user)
