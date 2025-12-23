@@ -9,11 +9,11 @@ use App\Models\User;
 
 class OtpService
 {
-    private $apiKey = '4bbba58b-ab97-4062-91a2-a3ab5b972691';
+    private $apiKey = '';
 
 
 
-    private $apiUrl = 'http://192.168.1.5:8082';
+    private $apiUrl = 'https://www.traccar.org/sms/';
 
     /* ⬅️ إعدادات Apple */
     private string $appleReviewPhone = '+15555550123';
