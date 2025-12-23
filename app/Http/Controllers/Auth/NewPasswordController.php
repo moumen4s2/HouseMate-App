@@ -17,7 +17,7 @@ class NewPasswordController extends Controller
         $validator = Validator::make($request->all(), [
             'otp' => ['required', 'string', 'min:5', 'max:5'],
             'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
-            'password' => ['required','confirmed','min:8','regex:/[a-z]/','regex:/[A-Z]/','regex:/[0-9]/','regex:/[@$!%*#?&]/'],
+            'password' => ['required', 'confirmed', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/','not_regex:/\s/'],
         ]);
         if ($validator->fails()) {
             return $this->fail($validator->errors(), 422);
