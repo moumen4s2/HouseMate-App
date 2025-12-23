@@ -21,8 +21,8 @@ class UpdatePersonalInfoController extends Controller
             'avatar_url' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
             'id_document_url' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
             'date_of_birth' => ['nullable', Rule::date()/*->format('dd-mm-yyyy')*/->before(today())],
-            'dir'=>['nullable', 'in:rtl,ltr'],
-            'mode'=>['nullable', 'in:dark,light']
+            'dir' => ['nullable', 'in:rtl,ltr'],
+            'mode' => ['nullable', 'in:dark,light']
         ]);
         if ($validator->fails()) {
             return $this->fail($validator->errors(), 422);
@@ -43,9 +43,20 @@ class UpdatePersonalInfoController extends Controller
             $path = $request->file('id_document_url')->store('profiles', 'public');
             $validated['id_document_url'] = $path;
         }
-        $user->update([
-            ...$validated,
-        ]);
+        $user->update($validated);
+
+        $responseUser = $user->toArray();
+
+        $responseUser['avatar_url'] = $user->avatar_url
+            ? asset('storage/' . $user->avatar_url)
+            : null;
+
+        $responseUser['id_document_url'] = $user->id_document_url
+            ? asset('storage/' . $user->id_document_url)
+            : null;
+
+        return $this->success('information updated !', $responseUser, 200);
+
         return  $this->success('information updated !', $user, 200);
     }
 }
