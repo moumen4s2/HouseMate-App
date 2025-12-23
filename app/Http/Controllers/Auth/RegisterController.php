@@ -47,11 +47,14 @@ try{
         $validated = $validator->validated();
         if ($request->hasFile('avatar_url')) {
             $path = $request->file('avatar_url')->store('profiles', 'public');
-            $validated['avatar_url'] = $path;
+            $validated['avatar_url'] = asset('storage/' . $path);
+        }
+        else{
+            $validated['avatar_url'] = asset('storage/' . 'profiles/default-profile.jpg');
         }
         if ($request->hasFile('id_document_url')) {
             $path = $request->file('id_document_url')->store('profiles', 'public');
-            $validated['id_document_url'] = $path;
+            $validated['id_document_url'] = asset('storage/' . $path);
         }
 
         $otp = (string) rand(10000, 99999);
