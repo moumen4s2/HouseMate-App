@@ -9,11 +9,11 @@ use App\Models\User;
 
 class OtpService
 {
-    private $apiKey = 'ezsJO6ioSg-Xx9aWb78ojT:APA91bGmvyjqAQQS8pY5FZ8DMId-mNfnKr6ABp-4GVa--nbt4f5bR98tC9EmDi5K-eLCRXByFaGGWHbyxgaMTwsJBI7MqPLGxBe-_MfVDVgIkptR_JY0BXs';
+    private $apiKey = '4bbba58b-ab97-4062-91a2-a3ab5b972691';
 
 
 
-    private $apiUrl = 'https://www.traccar.org/sms/';
+    private $apiUrl = 'http://192.168.1.5:8082';
 
     /* ⬅️ إعدادات Apple */
     private string $appleReviewPhone = '+15555550123';
@@ -94,6 +94,4 @@ class OtpService
             return false;
         }
     }
-
-
 }

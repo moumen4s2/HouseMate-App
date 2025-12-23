@@ -11,7 +11,7 @@ class AdminController extends Controller
 
     public function showRegisters()
     {
-        $users = User::whereNotNull('email_verified_at')->where('is_approved', false)->where('role', "!=", "admin")->paginate(10);
+        $users = User::whereNotNull('phone_verified_at')->where('is_approved', false)->where('role', "!=", "admin")->paginate(10);
         return $this->success('done', $users, 200);
     }
 
@@ -32,7 +32,7 @@ class AdminController extends Controller
     public function approvedRegistration(User $user)
     {
 
-        if ($user->email_verified_at && !$user->is_approved && $user->role !== 'admin') {
+        if ($user->phone_verified_at && !$user->is_approved && $user->role !== 'admin') {
             $user->is_approved = true;
             $user->save();
             return $this->success('Registration approved !', $user, 201);

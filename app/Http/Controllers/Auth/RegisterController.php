@@ -60,14 +60,14 @@ try{
         if ($existingUser && $existingUser->phone_verified_at === null) {
             $existingUser->update([
                 ...$validated,
-                'otp' => Hash::make($otp),
+                'otp' => /*Hash::make($otp)*/$otp,
                 'expire_at' => now()->addMinutes(15),
             ]);
         } else {
         
             User::create([
                 ...$validated,
-                'otp' => Hash::make($otp),
+                'otp' => /*Hash::make($otp)*/$otp,
                 'expire_at' => now()->addMinutes(15),
             ]);
          }
