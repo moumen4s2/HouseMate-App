@@ -29,7 +29,7 @@ try{
             'first_name' => ['required', 'string', 'max:255'],
             'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
             'last_name' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/'],
+            'password' => ['required', 'confirmed', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/','not_regex:/\s/'],
             'role' => ['nullable', 'string', 'in:tenant,owner'],
             'avatar_url' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
             'id_document_url' => ['required', 'image', 'mimes:jpg,png,jpeg', 'max:4096'],
@@ -47,11 +47,14 @@ try{
         $validated = $validator->validated();
         if ($request->hasFile('avatar_url')) {
             $path = $request->file('avatar_url')->store('profiles', 'public');
-            $validated['avatar_url'] = $path;
+            $validated['avatar_url'] = asset('storage/' . $path);
+        }
+        else{
+            $validated['avatar_url'] = asset('storage/' . 'profiles/default-profile.jpg');
         }
         if ($request->hasFile('id_document_url')) {
             $path = $request->file('id_document_url')->store('profiles', 'public');
-            $validated['id_document_url'] = $path;
+            $validated['id_document_url'] = asset('storage/' . $path);
         }
 
         $otp = (string) rand(10000, 99999);
@@ -60,14 +63,14 @@ try{
         if ($existingUser && $existingUser->phone_verified_at === null) {
             $existingUser->update([
                 ...$validated,
-                'otp' => Hash::make($otp),
+                'otp' => /*Hash::make($otp)*/$otp,
                 'expire_at' => now()->addMinutes(15),
             ]);
         } else {
         
             User::create([
                 ...$validated,
-                'otp' => Hash::make($otp),
+                'otp' => /*Hash::make($otp)*/$otp,
                 'expire_at' => now()->addMinutes(15),
             ]);
          }

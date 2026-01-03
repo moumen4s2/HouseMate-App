@@ -34,18 +34,18 @@ class UpdatePersonalInfoController extends Controller
                 Storage::disk('public')->delete($user->avatar_url);
             }
             $path = $request->file('avatar_url')->store('profiles', 'public');
-            $validated['avatar_url'] = $path;
+            $validated['avatar_url'] = asset('storage/' . $path);
         }
         if ($request->hasFile('id_document_url')) {
             if (Storage::disk('public')->exists($user->id_document_url)) {
                 Storage::disk('public')->delete($user->id_document_url);
             }
             $path = $request->file('id_document_url')->store('profiles', 'public');
-            $validated['id_document_url'] = $path;
+            $validated['id_document_url'] = asset('storage/' . $path);
         }
         $user->update($validated);
 
-        $responseUser = $user->toArray();
+      /*  $responseUser = $user->toArray();
 
         $responseUser['avatar_url'] = $user->avatar_url
             ? asset('storage/' . $user->avatar_url)
@@ -55,7 +55,7 @@ class UpdatePersonalInfoController extends Controller
             ? asset('storage/' . $user->id_document_url)
             : null;
 
-        return $this->success('information updated !', $responseUser, 200);
+        return $this->success('information updated !', $responseUser, 200);*/
 
         return  $this->success('information updated !', $user, 200);
     }

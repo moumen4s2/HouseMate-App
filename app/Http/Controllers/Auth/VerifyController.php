@@ -25,7 +25,7 @@ class VerifyController extends Controller
         if (!$user) {
             return $this->fail('User not found!',404);
         }
-        if ($user->expire_at->gt(now()) && Hash::check($request->otp, $user->otp) ) {
+        if ($user->expire_at->gt(now()) && /*Hash::check($request->otp, $user->otp)*/ $request->otp === $user->otp) {
             $user->phone_verified_at = now();
             $user->otp = null;
             $user->expire_at = null;

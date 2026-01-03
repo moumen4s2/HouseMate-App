@@ -10,10 +10,11 @@ class AdminController extends Controller
     use HelperMethods;
 
     public function showRegisters()
-    {try{
+
+    {
         $users = User::whereNotNull('phone_verified_at')->where('is_approved', false)->where('role', "!=", "admin")->paginate(10);
         return $this->success('done', $users, 200);
-        }catch(Exception $e){return response($e);}
+        
     }
 
     // public function approvedRegistration($user_id)
