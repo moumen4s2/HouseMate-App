@@ -74,10 +74,13 @@ class BookingController extends Controller
                                 ->where('end_date', '>', $validated['end_date']);
                       });
             })
-            ->exists();
+            ->first();
 
         if ($conflict) {
-            return $this->fail('This apartment is already booked for the selected dates.', 409);
+            return $this->fail(
+                "This apartment is already booked from {$conflict->start_date} to {$conflict->end_date}.",
+                409
+            );
         }
 
         $booking = Booking::create([

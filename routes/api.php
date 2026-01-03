@@ -29,11 +29,13 @@ Route::prefix('/auth')->group(function () {
 
 //Apartment
 Route::get('/apartments', [ApartmentController::class, 'index']);
+Route::get('/apartments/top-rated', [ApartmentController::class, 'topRated']);
 Route::get('/apartments/{apartment}', [ApartmentController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/apartments', [ApartmentController::class, 'store']);
     Route::put('/apartments/{apartment}', [ApartmentController::class, 'update']);
     Route::delete('/apartments/{apartment}', [ApartmentController::class, 'destroy']);
+    Route::post('/apartments/{apartment}/rate', [ApartmentController::class, 'rateApartment']);
 });
 
 //Booking
