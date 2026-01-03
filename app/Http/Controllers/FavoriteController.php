@@ -22,7 +22,7 @@ class FavoriteController extends Controller
             return $this->fail('Unauthorized. Only tenants can view favorites.', 403);
         }
         
-        $apartments = $user->favorites()->with(['apartment.images'])->paginate(10);
+        $apartments = $user->favorites()->with(['apartment.images','apartment.owner'])->paginate(10);
         return $this->success('Favorite apartments fetched successfully!', $apartments, 200);
     }
 

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperMethods;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,29 +33,18 @@ class UpdatePersonalInfoController extends Controller
                 Storage::disk('public')->delete($user->avatar_url);
             }
             $path = $request->file('avatar_url')->store('profiles', 'public');
-            $validated['avatar_url'] = asset('storage/' . $path);
+            $validated['avatar_url'] =  $path;
         }
         if ($request->hasFile('id_document_url')) {
             if (Storage::disk('public')->exists($user->id_document_url)) {
                 Storage::disk('public')->delete($user->id_document_url);
             }
-            $path = $request->file('id_document_url')->store('profiles', 'public');
-            $validated['id_document_url'] = asset('storage/' . $path);
+            $path = $request->file('id_document_url')->store('id_document', 'public');
+            $validated['id_document_url'] =  $path;
         }
         $user->update($validated);
 
-      /*  $responseUser = $user->toArray();
-
-        $responseUser['avatar_url'] = $user->avatar_url
-            ? asset('storage/' . $user->avatar_url)
-            : null;
-
-        $responseUser['id_document_url'] = $user->id_document_url
-            ? asset('storage/' . $user->id_document_url)
-            : null;
-
-        return $this->success('information updated !', $responseUser, 200);*/
-
-        return  $this->success('information updated !', $user, 200);
+    
+        return $this->success('information updated !', $user, 200);
     }
 }

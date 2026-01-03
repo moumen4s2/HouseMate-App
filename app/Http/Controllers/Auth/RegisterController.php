@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Http\Controllers\HelperMethods;
 use Illuminate\Support\Facades\Hash;
 use App\Services\OtpService;
-use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class RegisterController extends Controller
 {
@@ -21,10 +21,8 @@ class RegisterController extends Controller
         $this->otpService = $otpService;
     }
 
-    
     public function store(Request $request)
     {
-try{
         $validationRules = [
             'first_name' => ['required', 'string', 'max:255'],
             'phone' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
@@ -47,20 +45,24 @@ try{
         $validated = $validator->validated();
         if ($request->hasFile('avatar_url')) {
             $path = $request->file('avatar_url')->store('profiles', 'public');
-            $validated['avatar_url'] = asset('storage/' . $path);
+            $validated['avatar_url'] =  $path;
         }
-        else{
-            $validated['avatar_url'] = asset('storage/' . 'profiles/default-profile.jpg');
-        }
+
         if ($request->hasFile('id_document_url')) {
-            $path = $request->file('id_document_url')->store('profiles', 'public');
-            $validated['id_document_url'] = asset('storage/' . $path);
+            $path = $request->file('id_document_url')->store('id_document', 'public');
+            $validated['id_document_url'] =  $path;
         }
 
         $otp = (string) rand(10000, 99999);
         $this->otpService->attemptSendOtp($request->phone, $otp);
         $validated['password'] = Hash::make($request->password);
         if ($existingUser && $existingUser->phone_verified_at === null) {
+            if ($existingUser->avatar_url !== 'profiles/default-profile.jpg' && Storage::disk('public')->exists($existingUser->avatar_url)) {
+            Storage::disk('public')->delete($existingUser->avatar_url);
+        }
+        if (Storage::disk('public')->exists($existingUser->id_document_url)) {
+            Storage::disk('public')->delete($existingUser->id_document_url);
+        }
             $existingUser->update([
                 ...$validated,
                 'otp' => /*Hash::make($otp)*/$otp,
@@ -76,7 +78,5 @@ try{
          }
 
         return  $this->success('OTP sent successfully to phone number, please verify your phone number !', null, 200);
-}catch(Exception $e){
-    return response($e);
-}}
+}
 }

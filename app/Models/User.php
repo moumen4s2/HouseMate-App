@@ -34,7 +34,7 @@ class User extends Authenticatable
         'otp',
         'expire_at'
     ];
-
+    protected $appends = ['full_avatar_url','full_id_document_url'];
     protected function casts(): array
     {
         return [
@@ -76,5 +76,14 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function getFullAvatarUrlAttribute()
+    {
+        return asset('storage/' . $this->avatar_url);
+    }
+    public function getFullIdDocumentUrlAttribute()
+    {
+        return asset('storage/' . $this->id_document_url);
     }
 }
