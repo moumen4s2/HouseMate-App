@@ -25,7 +25,7 @@ Route::prefix('/auth')->group(function () {
     Route::post('/new-password', [NewPasswordController::class, 'store'])->middleware('guest:sanctum');
     Route::post('/update-user-info', [UpdatePersonalInfoController::class, 'store'])->middleware('auth:sanctum');
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return  $request->user();
     })->middleware('auth:sanctum');
 });
 
@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 //Admin
 Route::prefix('/admin')->group(function () {
+    Route::get('/show-unapprovedregisters', [AdminController::class, 'showunapprovedRegisters'])->middleware(['auth:sanctum', 'checkAdmin']);
     Route::get('/show-registers', [AdminController::class, 'showRegisters'])->middleware(['auth:sanctum', 'checkAdmin']);
     Route::put('/approve-registration/{user}', [AdminController::class, 'approvedRegistration'])->middleware(['auth:sanctum', 'checkAdmin']);
     Route::delete('/delete-registration/{user}', [AdminController::class, 'deleteRegistration'])->middleware(['auth:sanctum', 'checkAdmin']);

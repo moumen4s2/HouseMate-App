@@ -22,9 +22,9 @@ class LoginController extends Controller
             return $this->fail($validator->errors(), 422);
         }
 
-        // if ( !Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
-        //     return response()->json(['errors' => 'Invalid credentials !'], 401);
-        // }
+        //  if ( !Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
+        //      return response()->json(['errors' => 'Invalid credentials !'], 401);
+        //  }
 
         $user = User::where('phone', $request->phone)
             ->whereNotNull('phone_verified_at')->where('is_approved', true)
@@ -33,11 +33,10 @@ class LoginController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return  $this->fail('Invalid credentials !', 401);
         }
+        
 
         $token = $user->createToken('token')->plainTextToken;
-
-
-        return $this->success('Logged in successfully !', ['token' => $token,'role'=>$user->role], 200);
+        return $this->success('Logged in successfully !', ['token' => $token, 'role' => $user->role], 200);
     }
 
     public function destroy(Request $request)
@@ -46,7 +45,6 @@ class LoginController extends Controller
         if ($user) {
 
             $user->currentAccessToken()->delete();
-
 
             return $this->success('LogOut successfully !', null, 200);
         }
