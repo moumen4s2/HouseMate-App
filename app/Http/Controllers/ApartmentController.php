@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Apartment;
 use App\Models\ApartmentImage;
+use App\Models\Review;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -33,7 +35,7 @@ class ApartmentController extends Controller
         }
 
         if ($request->has('guests_min') && is_numeric($request->guests_min)) {
-        $query->where('guests', '>=', $request->guests_min);
+            $query->where('guests', '>=', $request->guests_min);
         }
     
         $query->where('is_active', true);
@@ -43,7 +45,9 @@ class ApartmentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Apartment::with(['images', 'owner']);
+        $query = Apartment::with(['images', 'owner'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews');
         $query = $this->applyFilters($query, $request);
         $apartments = $query->paginate(15); 
         return $this->success('Apartments fetched successfully', $apartments);
@@ -51,18 +55,27 @@ class ApartmentController extends Controller
 
     public function show(Apartment $apartment)
     {
-        $apartment->load([
-            'images', 
-            'owner',
-            'reviews.tenant' 
-        ]);
-
-        if ( !$apartment->is_active ) {
+        if (!$apartment->is_active) {
             return $this->fail('Apartment not found or inactive!', 404);
         }
 
-        return $this->success('Apartment details fetched successfully', $apartment);
+        $apartment->load([
+            'images',
+            'owner',
+        ]);
+
+        $averageRating = round($apartment->reviews()->avg('rating'), 1);
+        $reviewsCount  = $apartment->reviews()->count();
+
+        return $this->success('Apartment details fetched successfully', [
+            'apartment' => $apartment,
+            'rating' => [
+                'average' => $averageRating,
+                'count' => $reviewsCount
+            ]
+        ]);
     }
+
 
         public function store(Request $request)
     {
@@ -197,6 +210,55 @@ class ApartmentController extends Controller
 
         $apartment->delete();
         return $this->success('Apartment deleted successfully', null, 200);
+    }
+
+    public function rateApartment(Request $request, Apartment $apartment)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'tenant') {
+            return $this->fail('Only tenants can rate apartments.', 403);
+        }
+
+        $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'rating' => 'required|numeric|min:1|max:5',
+        ]);
+
+        $booking = Booking::where('id', $request->booking_id)
+            ->where('tenant_id', $user->id)
+            ->where('apartment_id', $apartment->id)
+            ->where('status', 'confirmed')
+            ->where('end_date', '<', now())
+            ->first();
+
+        if (!$booking) {
+            return $this->fail('You can only rate apartments you stayed in.', 403);
+        }
+
+        $review = Review::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'booking_id' => $booking->id,
+            ],
+            [
+                'apartment_id' => $apartment->id,
+                'rating' => $request->rating,
+            ]
+        );
+
+        return $this->success('Apartment rated successfully.', $review);
+    }
+
+    public function topRated()
+    {
+        $apartments = Apartment::with(['images', 'owner'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->orderByDesc('reviews_avg_rating')
+            ->paginate(10);
+
+        return $this->success('Top rated apartments fetched successfully.', $apartments);
     }
 
 }
