@@ -6,6 +6,8 @@ use App\Http\Controllers\HelperMethods;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Services\FcmService;
+use App\Events\BookingStatusChanged;
 
 class BookingController extends Controller
 {
@@ -24,12 +26,10 @@ class BookingController extends Controller
 
         if ($user->role === 'tenant') {
             $query->where('tenant_id', $user->id);
-
         } elseif ($user->role === 'owner') {
             $query->whereHas('apartment', function ($q) use ($user) {
                 $q->where('owner_id', $user->id);
             });
-
         } else {
             return $this->fail('Unauthorized access to bookings list.', 403);
         }
@@ -68,11 +68,11 @@ class BookingController extends Controller
             ->where('status', 'confirmed')
             ->where(function ($query) use ($validated) {
                 $query->whereBetween('start_date', [$validated['start_date'], $validated['end_date']])
-                      ->orWhereBetween('end_date', [$validated['start_date'], $validated['end_date']])
-                      ->orWhere(function ($query) use ($validated) {
-                          $query->where('start_date', '<', $validated['start_date'])
-                                ->where('end_date', '>', $validated['end_date']);
-                      });
+                    ->orWhereBetween('end_date', [$validated['start_date'], $validated['end_date']])
+                    ->orWhere(function ($query) use ($validated) {
+                        $query->where('start_date', '<', $validated['start_date'])
+                            ->where('end_date', '>', $validated['end_date']);
+                    });
             })
             ->exists();
 
@@ -127,11 +127,11 @@ class BookingController extends Controller
                     ->where('status', 'confirmed')
                     ->where(function ($query) use ($booking) {
                         $query->whereBetween('start_date', [$booking->pending_start_date, $booking->pending_end_date])
-                              ->orWhereBetween('end_date', [$booking->pending_start_date, $booking->pending_end_date])
-                              ->orWhere(function ($q) use ($booking) {
-                                  $q->where('start_date', '<', $booking->pending_start_date)
+                            ->orWhereBetween('end_date', [$booking->pending_start_date, $booking->pending_end_date])
+                            ->orWhere(function ($q) use ($booking) {
+                                $q->where('start_date', '<', $booking->pending_start_date)
                                     ->where('end_date', '>', $booking->pending_end_date);
-                              });
+                            });
                     })
                     ->exists();
 
@@ -146,14 +146,15 @@ class BookingController extends Controller
                     'pending_end_date' => null,
                     'status' => 'confirmed',
                 ]);
-
-            } else { 
+                $notificationMessage = 'تمت الموافقة على تعديل الحجز';
+            } else {
                 $booking->update([
                     'pending_start_date' => null,
                     'pending_end_date' => null,
                     'status' => $booking->old_status ?? 'pending',
                     'old_status' => null
                 ]);
+                $notificationMessage = 'تم رفض طلب تعديل الحجز';
             }
 
             $booking->load('apartment.images', 'tenant');
@@ -168,10 +169,15 @@ class BookingController extends Controller
                 ->where('status', 'pending')
                 ->where(function ($query) use ($booking) {
                     $query->whereBetween('start_date', [$booking->start_date, $booking->end_date])
-                          ->orWhereBetween('end_date', [$booking->start_date, $booking->end_date]);
+                        ->orWhereBetween('end_date', [$booking->start_date, $booking->end_date]);
                 })
                 ->update(['status' => 'rejected']);
         }
+        $notificationMessage = "تم تغيير حالة الحجز إلى {$newStatus}";
+        event(new BookingStatusChanged(
+            $booking,
+            $notificationMessage
+        ));
 
         $booking->load('apartment.images', 'tenant');
         return $this->success("Booking status updated to {$newStatus}", $booking);

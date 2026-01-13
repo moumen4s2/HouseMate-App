@@ -59,3 +59,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/favorites/{apartment}', [FavoriteController::class, 'store']);
     Route::delete('/favorites/{apartment}', [FavoriteController::class, 'destroy']);
 });
+
+//Notifications
+Route::post('saveFcmToken',function (Request $request)
+{
+    $request->validate([
+        'fcm_token' => 'required|string'
+    ]);
+
+    $request->user()->fcmTokens()->firstOrCreate([
+        'token' => $request->fcm_token
+    ]);
+
+    return response()->json('FCM token saved',201);
+})->middleware('auth:sanctum');
