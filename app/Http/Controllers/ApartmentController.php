@@ -35,6 +35,10 @@ class ApartmentController extends Controller
             $query->where('rooms', '>=', $request->rooms_min);
         }
 
+        if ($request->has('rooms_max') && is_numeric($request->rooms_max)) {
+            $query->where('rooms', '<=', $request->rooms_max);
+        }
+
         if ($request->has('guests_min') && is_numeric($request->guests_min)) {
             $query->where('guests', '>=', $request->guests_min);
         }
