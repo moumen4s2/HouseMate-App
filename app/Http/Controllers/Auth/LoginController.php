@@ -33,7 +33,7 @@ class LoginController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return  $this->fail('Invalid credentials !', 401);
         }
-        
+
 
         $token = $user->createToken('token')->plainTextToken;
         return $this->success('Logged in successfully !', ['token' => $token, 'role' => $user->role], 200);
@@ -44,6 +44,17 @@ class LoginController extends Controller
         $user = $request->user();
         if ($user) {
 
+            // $request->validate([
+            //     'fcm_token' => 'required|string'
+            // ]);
+
+            // $request->user()
+            //     ->fcmTokens()
+            //     ->where('token', $request->fcm_token)
+            //     ->delete();
+
+            
+            $user->fcmTokens()->delete();
             $user->currentAccessToken()->delete();
 
             return $this->success('LogOut successfully !', null, 200);

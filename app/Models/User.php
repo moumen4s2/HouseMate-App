@@ -26,7 +26,8 @@ class User extends Authenticatable
         'expire_at',
         'date_of_birth',
         'mode',
-        'dir'
+        'dir',
+        'fcm_token'
     ];
 
     protected $hidden = [
@@ -86,4 +87,9 @@ class User extends Authenticatable
     {
         return asset('storage/' . $this->id_document_url);
     }
+
+    public function fcmTokens()
+{
+    return $this->hasMany(FcmToken::class);
+}
 }

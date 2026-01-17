@@ -71,3 +71,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/conversations/{conversation}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'send']);
 });
+
+//Notifications
+Route::post('saveFcmToken',function (Request $request)
+{
+    $request->validate([
+        'fcm_token' => 'required|string'
+    ]);
+
+    $request->user()->fcmTokens()->firstOrCreate([
+        'token' => $request->fcm_token
+    ]);
+
+    return response()->json('FCM token saved',201);
+})->middleware('auth:sanctum');
