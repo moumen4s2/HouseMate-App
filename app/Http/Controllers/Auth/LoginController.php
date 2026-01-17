@@ -44,14 +44,17 @@ class LoginController extends Controller
         $user = $request->user();
         if ($user) {
 
-            $request->validate([
-                'fcm_token' => 'required|string'
-            ]);
+            // $request->validate([
+            //     'fcm_token' => 'required|string'
+            // ]);
 
-            $request->user()
-                ->fcmTokens()
-                ->where('token', $request->fcm_token)
-                ->delete();
+            // $request->user()
+            //     ->fcmTokens()
+            //     ->where('token', $request->fcm_token)
+            //     ->delete();
+
+            
+            $user->fcmTokens()->delete();
             $user->currentAccessToken()->delete();
 
             return $this->success('LogOut successfully !', null, 200);

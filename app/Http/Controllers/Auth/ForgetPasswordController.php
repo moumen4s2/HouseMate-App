@@ -6,10 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use App\Http\Controllers\HelperMethods;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifyMail;
 use Illuminate\Support\Facades\Hash;
 use App\Services\OtpService;
 
@@ -37,6 +34,7 @@ class ForgetPasswordController extends Controller
             return $this->fail('user not found !', 404);
         }
         $otp = (string) rand(10000, 99999);
+        // app(\App\Services\OtpService::class)->attemptSendOtp($request->phone, $otp);
         $this->otpService->attemptSendOtp($request->phone, $otp);
         $user->update([
             'otp' => Hash::make($otp),

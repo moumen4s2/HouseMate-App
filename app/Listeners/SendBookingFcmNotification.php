@@ -38,7 +38,9 @@ class SendBookingFcmNotification
     ]),
 ]);
 
-        foreach ($booking->tenant->fcmTokens as $token) {
+        // foreach ($booking->tenant->fcmTokens as $token) {
+        $token=$booking->tenant->fcmTokens;
+        if($token){
             app(\App\Services\FcmService::class)->send(
                 $token->token,
                 'تحديث حالة الحجز',
@@ -49,6 +51,6 @@ class SendBookingFcmNotification
                     'type' => 'booking_status'
                 ]
             );
-        }
-    }
+        // }
+    }}
 }
