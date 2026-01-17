@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Controllers\HelperMethods;
+use Exception;
 
 class ApartmentController extends Controller
 {
@@ -240,6 +241,7 @@ class ApartmentController extends Controller
             [
                 'user_id' => $user->id,
                 'booking_id' => $booking->id,
+            
             ],
             [
                 'apartment_id' => $apartment->id,
@@ -248,6 +250,7 @@ class ApartmentController extends Controller
         );
 
         return $this->success('Apartment rated successfully.', $review);
+   
     }
 
     public function topRated()

@@ -37,7 +37,7 @@ class ForgetPasswordController extends Controller
         // app(\App\Services\OtpService::class)->attemptSendOtp($request->phone, $otp);
         $this->otpService->attemptSendOtp($request->phone, $otp);
         $user->update([
-            'otp' => Hash::make($otp),
+            'otp' => /*Hash::make($otp)*/$otp,
             'expire_at' => now()->addMinutes(15),
         ]);
 

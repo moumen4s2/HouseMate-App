@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
 
             $table->tinyInteger('rating'); 
-            $table->text('comment')->nullable();
+            // $table->text('comment')->nullable();
             $table->timestamps();
 
             $table->unique(['user_id', 'booking_id']);

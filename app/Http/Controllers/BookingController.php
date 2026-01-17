@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\FcmService;
 use App\Events\BookingStatusChanged;
+use Exception;
 
 class BookingController extends Controller
 {
@@ -148,6 +149,8 @@ class BookingController extends Controller
                     'pending_start_date' => null,
                     'pending_end_date' => null,
                     'status' => 'confirmed',
+                    'old_status'=>null,
+                    'old_total_price'=>null
                 ]);
                 $notificationMessage = 'تمت الموافقة على تعديل الحجز';
             } else {
@@ -155,7 +158,9 @@ class BookingController extends Controller
                     'pending_start_date' => null,
                     'pending_end_date' => null,
                     'status' => $booking->old_status ?? 'pending',
-                    'old_status' => null
+                    'old_status' => null,
+                    'total_price'=>$booking->old_total_price,
+                    'old_total_price'=>null
                 ]);
                 $notificationMessage = 'تم رفض طلب تعديل الحجز';
             }
@@ -222,6 +227,7 @@ class BookingController extends Controller
         $validator = Validator::make($request->all(), [
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
+            'total_price' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -233,6 +239,8 @@ class BookingController extends Controller
             'pending_start_date' => $request->start_date,
             'pending_end_date' => $request->end_date,
             'status' => 'pending_update',
+            'old_total_price'=>$booking->total_price,
+            'total_price'=>$request->total_price
         ]);
 
         return $this->success("Update request sent. Waiting for owner approval.", $booking);

@@ -79,7 +79,7 @@ Route::post('saveFcmToken',function (Request $request)
         'fcm_token' => 'required|string'
     ]);
 
-    $request->user()->fcmTokens()->firstOrCreate([
+    $request->user()->fcmTokens()->firstOrCreate([],[
         'token' => $request->fcm_token
     ]);
 

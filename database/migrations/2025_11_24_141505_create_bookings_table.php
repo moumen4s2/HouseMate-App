@@ -20,8 +20,9 @@ return new class extends Migration
             $table->date('pending_start_date')->nullable();
             $table->date('pending_end_date')->nullable();
             $table->string('old_status')->nullable();
-            $table->enum('status', ['pending','accepted','rejected','cancelled'])->default('pending');
-            $table->decimal('total_price', 10,2)->default(0);
+            $table->enum('status', ['pending', 'accepted', 'rejected', 'cancelled'])->default('pending');
+            $table->decimal('total_price', 10, 2)->default(0);
+            $table->decimal('old_total_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }

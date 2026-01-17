@@ -28,7 +28,7 @@ class NewPasswordController extends Controller
         if (!$user) {
             return $this->fail("user not found !", 404);
         }
-        if ($user->expire_at->gt(now()) && Hash::check($request->otp, $user->otp)) {
+        if ($user->expire_at->gt(now()) && $request->otp === $user->otp) {
 
             $user->update([
                 'password' => Hash::make($request->password),
